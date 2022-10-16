@@ -190,24 +190,43 @@ if not os.path.exists("opening"):
 if not os.path.exists("closing"):
     os.mkdir("closing")
 images=os.listdir("Images")
-for elt in elmnts:
-    for img in images:
+
+if not os.path.exists("question1"):
+    os.mkdir("question1")
+
+for img in images:
+    plt.figure(figsize=(40, 20), dpi=120)
+    cpt = 1
+    for elt in elmnts:
+
+
       print(elt,img)
-      for t in range(1,8,2):
-       try:
-        im = gris_depuis_couleur( skio.imread('Images/'+img))
+      for t in range(3,7,2):
+        if img[-3:]=="png":
+            im = gris_depuis_couleur( skio.imread('Images/'+img))
+        else:
+            im=skio.imread('Images/'+img)
+
         se = strel(elt, t)
         dil = morpho.dilation(im, se)
-        plt.imsave("dilatation/"+img[:-4]+"_"+ elt+"_"+str(t)+".png",dil,cmap='gray',vmin=0,vmax=255)
-        er=morpho.erosion(im, se)
-        plt.imsave("erosion/"+img[:-4]+"_"+ elt+"_"+str(t)+".png", er, cmap='gray',vmin=0,vmax=255)
-        op = morpho.opening(im, se)
-        plt.imsave("opening/" + img[:-4] + "_" + elt + "_" + str(t) + ".png", op, cmap='gray',vmin=0,vmax=255)
-        cl = morpho.closing(im, se)
-        plt.imsave("closing/" + img[:-4] + "_" + elt + "_" + str(t) + ".png", cl, cmap='gray',vmin=0,vmax=255)
-       except:
-        pass
+        plt.subplot(4, 8, cpt)
+        plt.title("dilatation , element " + str(elt) + ',size:' + str(t))
+        plt.imshow(dil,cmap='gray',vmin=0,vmax=255)
 
+        er=morpho.erosion(im, se)
+        plt.subplot(4, 8, cpt+8)
+        plt.imshow(er, cmap='gray', vmin=0, vmax=255)
+        plt.title(f"erosion , element " + str(elt) + ',size:' + str(t))
+        op = morpho.opening(im, se)
+        plt.subplot(4, 8, cpt+16)
+        plt.imshow(op, cmap='gray', vmin=0, vmax=255)
+        plt.title(f"opening , element " + str(elt) + ',size:' + str(t))
+        cl = morpho.closing(im, se)
+        plt.subplot(4, 8, cpt+24)
+        plt.imshow(cl, cmap='gray', vmin=0, vmax=255)
+        plt.title(f"closing , element " + str(elt) + ',size:' + str(t))
+        cpt+=1
+    plt.savefig("question1/"+img[:-4]+".png")
 
 
 
