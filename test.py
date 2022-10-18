@@ -8,8 +8,15 @@ img=skio.imread("Images/retina2.gif")
 lst=os.listdir("opening")
 if not os.path.exists("tophat2"):
     os.mkdir("tophat2")
+plt.figure(figsize=(20, 20), dpi=80)
+cpt=1
 for i in lst:
     if i.startswith("retina2"):
-        x=gris_depuis_couleur(skio.imread("closing/"+i))
+        x=gris_depuis_couleur(skio.imread("opening/"+i))
         tp=img-x
-        plt.imsave("tophat/"+i,tp,vmin=0,vmax=255,cmap="gray")
+        plt.subplot(4,4,cpt)
+        plt.title(i.replace("retina2","")[:-4])
+        plt.imshow(tp,vmin=0,vmax=255,cmap="gray")
+        cpt+=1
+
+plt.savefig("tophat.png")

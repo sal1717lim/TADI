@@ -177,7 +177,7 @@ im=skio.imread('Images/retina2.gif')
 #im=skio.imread('Images/laiton.bmp')
 import os
 plt.imshow(im,cmap="gray")
-
+"""
 # viewimage(im) - Utilisable à la place de plt.imshow si Gimp est installé.
 #dilatation
 elmnts=['disk','diamond','square','line']
@@ -227,10 +227,307 @@ for img in images:
         plt.title(f"closing , element " + str(elt) + ',size:' + str(t))
         cpt+=1
     plt.savefig("question1/"+img[:-4]+".png")
+"""
+#preuve des propriete
+#Dilatation
+#1
+img=skio.imread('Images/cellbin.bmp')
+dilatation=gris_depuis_couleur(skio.imread('dilatation/cellbin_disk_5.png'))
+x=np.zeros((dilatation.shape[0],dilatation.shape[1],3))
+for i in range(dilatation.shape[0]):
+    for j in range(dilatation.shape[1]):
+        if dilatation[i,j]==255:
+            if img[i,j]==255:
+                x[i,j]=(255,255,255)
+            else:
+                x[i,j]=(255,0,0)
+
+plt.subplot(1,3,1)
+plt.imshow(img,cmap="gray")
+plt.title("original")
+plt.subplot(1,3,2)
+plt.imshow(dilatation,cmap="gray")
+plt.title("dilatation")
+plt.subplot(1,3,3)
+plt.imshow(x)
+plt.title("inclusion")
+plt.savefig("extensive.png")
+
+x=dilatation-img
+print("valeur de dilatation-image positive:",(x>=0).any())
+
+#2
+X=skio.imread("Question2/cellbin.bmp")
+Y=skio.imread("Question2/cellbin2.bmp")
+se = strel("disk", 3)
+plt.figure(figsize=(10,10))
+plt.subplot(2,2,1)
+plt.imshow(X,cmap='gray')
+plt.title("X")
+plt.subplot(2,2,2)
+plt.imshow(morpho.dilation(X,se),cmap='gray')
+plt.title("dilatation(X,B)")
+plt.subplot(2,2,3)
+plt.imshow(Y,cmap='gray')
+plt.title("Y")
+plt.subplot(2,2,4)
+plt.imshow(morpho.dilation(Y,se),cmap='gray')
+plt.title("dilatation(Y,B)")
+plt.savefig("question2.png")
+
+x=morpho.dilation(Y,se)-morpho.dilation(X,se)
+print("valeur de morpho.dilation(Y,se)-morpho.dilation(X,se) positive:",(x>=0).any())
+
+#3
+se = strel("disk", 3)
+se2 = strel("disk", 5)
+
+X1=morpho.dilation(Y,se)
+X2=morpho.dilation(Y,se2)
+res=np.zeros((X1.shape[0],X1.shape[1],3))
+for i in range(X1.shape[0]):
+    for j in range(X.shape[1]):
+        if X2[i,j]==255:
+            if X1[i,j]==255:
+                res[i,j]=(255,255,255)
+            else:
+                res[i,j]=(255,0,0)
+plt.subplot(1,4,1)
+plt.imshow(Y,cmap='gray')
+plt.title("X")
+plt.subplot(1,4,2)
+plt.imshow(X1,cmap='gray')
+plt.title("D(X,B)")
+plt.subplot(1,4,3)
+plt.imshow(X2,cmap='gray')
+plt.title("D(X,B')")
+plt.subplot(1,4,4)
+plt.imshow(res,cmap='gray')
+plt.title("inclusion")
+plt.savefig("question3.png")
+print("\n\n\n")
+
+x=X2-X1
+print("valeur de morpho.dilation(X,se)-morpho.dilation(X,se2) positive:",(x>=0).any())
+
+print("\n\n\n")
 
 
-
+#4
+X=skio.imread("Question2/cellbin.bmp")
+U=skio.imread("Question2/cellbin2.bmp")
+Y=U-X
+plt.figure()
+plt.subplot(1,3,1)
+plt.imshow(X,cmap="gray")
+plt.title("X")
+plt.subplot(1,3,2)
+plt.imshow(Y,cmap="gray")
+plt.title("Y")
+plt.subplot(1,3,3)
+plt.imshow(U,cmap="gray")
+plt.title("X U Y")
+plt.savefig("input_question4.png")
 imt=im.copy()
+plt.figure()
+plt.subplot(1,4,1)
+plt.imshow(morpho.dilation(X,se),cmap="gray")
+plt.title("D(X,B)")
+plt.subplot(1,4,2)
+plt.imshow(morpho.dilation(Y,se),cmap="gray")
+plt.title("D(Y,B)")
+plt.subplot(1,4,3)
+plt.imshow(morpho.dilation(X,se)+morpho.dilation(Y,se),cmap="gray")
+plt.title("D(X,B)UD(Y,B)")
+plt.subplot(1,4,4)
+plt.imshow(morpho.dilation(U,se),cmap="gray")
+plt.title("D(XUY,B)")
+plt.savefig("question4.png")
+
+print("test d'egalité entre les deux images:",np.equal(morpho.dilation(U,se),morpho.dilation(X,se)+morpho.dilation(Y,se)).any())
+
+X=skio.imread("Question2/cellbin.bmp")
+Y=skio.imread("Question2/cellbin3.bmp")
+inter=np.zeros(Y.shape)
+for i in range(X.shape[0]):
+    for j in range(Y.shape[1]):
+        if X[i,j]==Y[i,j]:
+          if X[i,j]!=0:
+            inter[i,j]=255
+z1=morpho.dilation(X,se)
+z2=morpho.dilation(Y,se)
+inter2=np.zeros(X.shape)
+for i in range(X.shape[0]):
+    for j in range(Y.shape[1]):
+        if z1[i,j]==z2[i,j]:
+          if z1[i,j]!=0:
+            inter2[i,j]=255
+plt.figure(figsize=(10,5))
+plt.subplot(1,4,1)
+plt.imshow(z1,cmap="gray")
+plt.title("D(X,B)")
+plt.subplot(1,4,2)
+plt.imshow(z2,cmap="gray")
+plt.title("D(Y,B)")
+plt.subplot(1,4,3)
+plt.imshow(morpho.dilation(inter,se),cmap="gray")
+plt.title("D(X inter Y,B)")
+plt.subplot(1,4,4)
+plt.imshow(inter2,cmap="gray")
+plt.title("D(X,B) inter D(Y,B)")
+plt.savefig("input_question42res.png")
+
+print("\n\n\n\ntest inclusion:",((inter2-morpho.dilation(inter,se)>=0)).any())
+
+X=skio.imread("Images/cellbin.bmp")
+se=strel("square",3)
+se2=strel("square",5)
+se3=strel("square",7)
+plt.subplot(1,2,1)
+plt.imshow(morpho.dilation(morpho.dilation(X,se),se2),cmap="gray")
+plt.title("D(D(X,B'),B)")
+plt.subplot(1,2,2)
+plt.imshow(morpho.dilation(X,se3),cmap="gray")
+plt.title("D(X,B+B')")
+
+print("D(X,B+B')=D(D(X,B'),B):",(morpho.dilation(morpho.dilation(X,se),se2)==morpho.dilation(X,se3)).any())
+
+plt.savefig("question5.png")
+#erosion
+
+X=skio.imread("Images/laiton.bmp")
+comp=255-X
+plt.subplot(2,4,1)
+plt.imshow(X,cmap="gray",vmin=0,vmax=255)
+plt.title("X")
+plt.subplot(2,4,2)
+plt.imshow(comp,cmap="gray",vmin=0,vmax=255)
+plt.title("255-X")
+plt.subplot(2,4,3)
+plt.imshow(morpho.dilation(comp,se),cmap="gray",vmin=0,vmax=255)
+plt.title("D(255-X,B)")
+plt.subplot(2,4,4)
+plt.imshow(255-morpho.dilation(comp,se),cmap="gray",vmin=0,vmax=255)
+plt.title("255-D(255-X,B)")
+plt.subplot(2,4,5)
+plt.imshow(X,cmap="gray")
+plt.title("X")
+plt.subplot(2,4,6)
+plt.imshow(morpho.erosion(X,se),cmap="gray",vmin=0,vmax=255)
+plt.title("E(X,B)")
+plt.savefig("erosionquestion1.png")
+
+##2
+Y=morpho.erosion(X,se)
+plt.subplot(1,2,1)
+plt.imshow(Y,cmap="gray",vmin=0,vmax=255)
+plt.subplot(1,2,2)
+plt.imshow(X,cmap="gray",vmin=0,vmax=255)
+plt.savefig("question2ero.png")
+
+print("\n\nanti-extensivité: ",((X-Y)>=0).any())
+#3
+X=skio.imread("Question2/cellbin.bmp")
+Y=skio.imread("Question2/cellbin2.bmp")
+
+se = strel("disk", 3)
+plt.figure(figsize=(10,10))
+plt.subplot(2,2,1)
+plt.imshow(X,cmap='gray')
+plt.title("X")
+plt.subplot(2,2,2)
+plt.imshow(morpho.erosion(X,se),cmap='gray')
+plt.title("E(X,B)")
+plt.subplot(2,2,3)
+plt.imshow(Y,cmap='gray')
+plt.title("Y")
+plt.subplot(2,2,4)
+plt.imshow(morpho.erosion(Y,se),cmap='gray')
+plt.title("E(Y,B)")
+plt.savefig("question2Ero.png")
+
+
+x=morpho.erosion(Y,se)-morpho.erosion(X,se)
+print("valeur de E(Y,se)-E(X,se) positive:",(x>=0).any())
+
+#3
+se = strel("disk", 3)
+se2 = strel("disk", 5)
+
+X1=morpho.erosion(Y,se)
+X2=morpho.erosion(Y,se2)
+res=np.zeros((X1.shape[0],X1.shape[1],3))
+for i in range(X1.shape[0]):
+    for j in range(X.shape[1]):
+        if X1[i,j]==255:
+            if X2[i,j]==255:
+                res[i,j]=(255,255,255)
+            else:
+                res[i,j]=(255,0,0)
+plt.subplot(1,4,1)
+plt.imshow(Y,cmap='gray')
+plt.title("X")
+plt.subplot(1,4,2)
+plt.imshow(X1,cmap='gray')
+plt.title("E(X,B)")
+plt.subplot(1,4,3)
+plt.imshow(X2,cmap='gray')
+plt.title("E(X,B')")
+plt.subplot(1,4,4)
+plt.imshow(res,cmap='gray')
+plt.title("inclusion")
+plt.savefig("question3ero.png")
+print("\n\n\n")
+
+x=X1-X2
+print("valeur de morpho.erosion(X,B)-morpho.erosion(X,B') positive:",(x>=0).any())
+
+#5
+X=skio.imread("Question2/cellbin.bmp")
+Y=skio.imread("Question2/cellbin3.bmp")
+inter=np.zeros(Y.shape)
+for i in range(X.shape[0]):
+    for j in range(Y.shape[1]):
+        if X[i,j]==Y[i,j]:
+          if X[i,j]!=0:
+            inter[i,j]=255
+z1=morpho.erosion(X,se)
+z2=morpho.erosion(Y,se)
+un=X+Y
+UN2=z1+z2
+plt.figure(figsize=(10,5))
+plt.subplot(1,4,1)
+plt.imshow(z1,cmap="gray")
+plt.title("E(X,B)")
+plt.subplot(1,4,2)
+plt.imshow(z2,cmap="gray")
+plt.title("E(Y,B)")
+plt.subplot(1,4,3)
+plt.imshow(morpho.erosion(un,se),cmap="gray")
+plt.title("E(X U Y,B)")
+plt.subplot(1,4,4)
+plt.imshow(UN2,cmap="gray")
+plt.title("E(X,B) U E(Y,B)")
+plt.savefig("input_question4UNIOres.png")
+
+
+print("\n\n\n\ntest d'inclusion:",((morpho.erosion(un,se)-UN2)>=0).any())
+
+X=skio.imread("Images/cellbin.bmp")
+se=strel("square",3)
+se2=strel("square",5)
+se3=strel("square",7)
+plt.subplot(1,2,1)
+plt.imshow(morpho.erosion(morpho.erosion(X,se),se2),cmap="gray")
+plt.title("E(E(X,B'),B)")
+plt.subplot(1,2,2)
+plt.imshow(morpho.erosion(X,se3),cmap="gray")
+plt.title("E(X,B+B')")
+
+print("E(X,B+B')=E(E(X,B'),B):",(morpho.erosion(morpho.erosion(X,se),se2)==morpho.erosion(X,se3)).any())
+
+plt.savefig("question5ero.png")
+exit(0)
 N=5
 for k in range(N):
     se=strel('disk',k)
